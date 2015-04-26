@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <title>GeoVis Example</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+      html {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000000 url(/globe/loading.gif) center center no-repeat;
+        color: #ffffff;
+        font-family: sans-serif;
+        font-size: 13px;
+        line-height: 20px;
+        height: 100%;
+      }
+
+      #info {
+
+        font-size: 11px;
+        position: absolute;
+        bottom: 5px;
+        background-color: rgba(0,0,0,0.8);
+        border-radius: 3px;
+        right: 10px;
+        padding: 10px;
+
+      }
+
+      #currentInfo {
+        width: 270px;
+        position: absolute;
+        left: 20px;
+        top: 63px;
+
+        background-color: rgba(0,0,0,0.2);
+
+        border-top: 1px solid rgba(255,255,255,0.4);
+        padding: 10px;
+      }
+
+      a {
+        color: #aaa;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .bull {
+        padding: 0 5px;
+        color: #555;
+      }
+
+      #title {
+        position: absolute;
+        top: 20px;
+        width: 270px;
+        left: 20px;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 3px;
+        font: 20px Georgia;
+        padding: 10px;
+      }
+
+      #ce span {
+        display: none;
+      }
+
+      #ce {
+        width: 107px;
+        height: 55px;
+        display: block;
+        position: absolute;
+        bottom: 15px;
+        left: 20px;
+        background: url(/globe/ce.png);
+      }
+
+
+    </style>
+  </head>
+  <body>
+
+  <div id="container"></div>
+
+  <div id="info">
+    <strong><a href="http://www.chromeexperiments.com/globe">WebGL Globe</a></strong> <span class="bull">&bull;</span> Created by <a href="http://www.datakind.org/howitworks/datachapters/datakind-sg/">DataKind SG</a> <span class="bull">&bull;</span> Data acquired from <a href="http://www.ipcc-data.org/cgi-bin/ddc_nav/">IPCC</a> and <a href="https://twitter.com/">Twitter</a>
+  </div>
+
+  <div id="title">
+    Earth Hour Global Twitter followers vs 1970's to 1990's average change in temperature
+  </div>
+
+  <a id="ce" href="http://www.chromeexperiments.com/globe">
+    <span>This is a Chrome Experiment</span>
+  </a>
+
+  <script type="text/javascript" src="/globe/third-party/Detector.js"></script>
+  <script type="text/javascript" src="/globe/third-party/three.min.js"></script>
+  <script type="text/javascript" src="/globe/third-party/Tween.js"></script>
+  <script type="text/javascript" src="/globe/globe.js"></script>
+  <script type="text/javascript">
+
+    if(!Detector.webgl){
+      Detector.addGetWebGLMessage();
+    } else {
+
+      var container = document.getElementById('container');
+      var globe = DAT.Globe(container, function(label) {return new THREE.Color([0xaa0000, 0xfa0002, 0xfe6500, 0xf7d009, 0xf7ee2f, 0xf5f5ff, 0xb4B3ff, 0x8382ff, 0x6060ff, 0x0c0Bff][label]);});
+      console.log(globe);
+      var tweens = [];
+      
+      var settime = function(globe) {
+        return function() {
+          new TWEEN.Tween(globe).to({time: 0},500).easing(TWEEN.Easing.Cubic.EaseOut).start();
+        };
+      };
+        
+      var xhr;
+      TWEEN.start();
+      
+      xhr = new XMLHttpRequest();
+      xhr.open('GET', '/globe/twitter_vs_temp.json', true);
+      xhr.onreadystatechange = function(e) {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            window.data = data;
+            for (i=0;i<data.length;i++) {
+              globe.addData(data[i][1], {format: 'legend', name: data[i][0], animated: true});
+            }
+            globe.createPoints();
+            settime(globe)();
+            globe.animate();
+            document.body.style.backgroundImage = 'none'; // remove loading
+          }
+        }
+      };
+      xhr.send(null);
+    }
+
+  </script>
+
+  </body>
+
+</html>
