@@ -1,0 +1,7 @@
+This globe visualization relies on this repo from the Google Data Arts Team: https://github.com/dataarts/webgl-globe/
+
+This version was coded during the April 2015 DataDive with Earth Hour Global. The only changes to the original repo were:
+* removing directories and files that were not used
+* changed the data in the json file
+* changed index.html
+* changed the jpg for the map on the globe
